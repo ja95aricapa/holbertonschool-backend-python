@@ -37,7 +37,8 @@ class TestGithubOrgClient(unittest.TestCase):
         """
         expected = "www.yes.com"
         payload = {"repos_url": expected}
-        with patch("client.GithubOrgClient.org", PropertyMock(return_value=payload)):
+        string = "client.GithubOrgClient.org"
+        with patch(string, PropertyMock(return_value=payload)):
             org_client = GithubOrgClient("x")
             self.assertEqual(org_client._public_repos_url, expected)
 
@@ -68,11 +69,18 @@ class TestGithubOrgClient(unittest.TestCase):
     )
     def test_has_license(self, repo, license_key, expected):
         """test the license checker"""
-        self.assertEqual(GithubOrgClient.has_license(repo, license_key), expected)
+        self.assertEqual(
+            GithubOrgClient.has_license(repo, license_key), expected
+            )
 
 
 @parameterized_class(
-    ("org_payload", "repos_payload", "expected_repos", "apache2_repos"), TEST_PAYLOAD
+    (
+        "org_payload",
+        "repos_payload",
+        "expected_repos",
+        "apache2_repos"
+    ), TEST_PAYLOAD
 )
 class TestIntegrationGithubOrgClient(unittest.TestCase):
     """
@@ -114,7 +122,10 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         self.assertEqual(y.public_repos(), self.expected_repos)
         self.assertEqual(y.public_repos("NONEXISTENT"), [])
         self.get.assert_has_calls(
-            [call("https://api.github.com/orgs/x"), call(self.org_payload["repos_url"])]
+            [
+                call("https://api.github.com/orgs/x"),
+                call(self.org_payload["repos_url"])
+            ]
         )
 
     def test_public_repos_with_license(self):
@@ -128,5 +139,8 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         self.assertEqual(y.public_repos("NONEXISTENT"), [])
         self.assertEqual(y.public_repos("apache-2.0"), self.apache2_repos)
         self.get.assert_has_calls(
-            [call("https://api.github.com/orgs/x"), call(self.org_payload["repos_url"])]
+            [
+                call("https://api.github.com/orgs/x"),
+                call(self.org_payload["repos_url"])
+            ]
         )
